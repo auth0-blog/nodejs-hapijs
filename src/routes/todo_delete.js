@@ -16,13 +16,14 @@ module.exports = {
     tags: ['api'],
   },
   handler: async (request, h) => {
-    let {sub: redispath} = request.auth.credentials;
-    let {index: redisindex} = request.payload;
-    let {redis} = request.server.app;
+    let {sub} = request.auth.credentials;
+    let {index} = request.payload;
+    let {fakeDb} = request.server.app;
+
+    if (!fakeDb[sub]) fakeDb[sub] = [];
 
     try {
-      await redis.lsetAsync(redispath, redisindex, '__DELETE__');
-      await redis.lremAsync(redispath, 1, '__DELETE__');
+      fakeDb[sub].splice(index, 1);
 
       return h.response({}).code(200);
     } catch (e) {

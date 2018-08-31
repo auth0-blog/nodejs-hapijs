@@ -16,16 +16,17 @@ module.exports = {
     tags: ['api'],
   },
   handler: async (request, h) => {
-    let {sub: redispath} = request.auth.credentials;
-    let {item: redisvalue} = request.payload;
-    let {redis} = request.server.app;
+    let {sub} = request.auth.credentials;
+    let {item} = request.payload;
+    let {fakeDb} = request.server.app;
+
+    if (!fakeDb[sub]) fakeDb[sub] = [];
 
     try {
-
-      let count = await redis.lpushAsync(redispath, redisvalue);
+      fakeDb[sub].push(item);
 
       return h.response({
-        count
+        count: fakeDb[sub].length
       }).code(201);
 
     } catch (e) {

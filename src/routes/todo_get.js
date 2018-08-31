@@ -17,13 +17,16 @@ module.exports = {
     tags: ['api'],
   },
   handler: async (request, h) => {
-    let {redis} = request.server.app;
-    let {sub: redispath} = request.auth.credentials;
+    let {fakeDb} = request.server.app;
+    let {sub} = request.auth.credentials;
     let {start, results} = request.query;
 
+    if (!fakeDb[sub]) fakeDb[sub] = [];
+
     try {
-      let value = await redis.lrangeAsync(redispath, start, start + (results - 1));
-      let count = await redis.llenAsync(redispath);
+
+      let value = fakeDb[sub].slice(start, start + results);
+      let count = fakeDb[sub];
 
       if (!value) value = [];
 
